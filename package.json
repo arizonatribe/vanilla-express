@@ -1,22 +1,28 @@
 {
-  "name": "vanilla-express",
-  "private": true,
+  "name": "create-vanilla-express",
   "version": "1.0.0",
   "description": "A scaffolding template for ExpressJs REST APIs",
   "main": "lib/index.js",
   "license": "MIT",
   "type": "commonjs",
   "engines": {
-    "node": ">=12.17.0 < 16.0.0"
+    "node": ">=12.17.0"
   },
+  "bin": {
+    "create-vanilla-express": "bin/index.js"
+  },
+  "keywords": [
+    "express",
+    "express api",
+    "express template",
+    "scaffolding"
+  ],
   "scripts": {
     "lint": "eslint lib",
     "start": "nodemon lib/server.js | pino-pretty",
     "prod": "node -v && node server.js"
   },
-  "authors": [
-    "David Nunez <arizonatribe@gmail.com>"
-  ],
+  "author": "David Nunez <arizonatribe@gmail.com>",
   "dependencies": {
     "body-parser": "^1.19.0",
     "compression": "^1.7.4",
