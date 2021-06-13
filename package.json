@@ -1,6 +1,6 @@
 {
   "name": "create-vanilla-express",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A scaffolding template for ExpressJs REST APIs",
   "main": "lib/index.js",
   "license": "MIT",
@@ -20,7 +20,7 @@
   "scripts": {
     "lint": "eslint lib",
     "start": "nodemon lib/server.js | pino-pretty",
-    "prod": "node -v && node server.js"
+    "prod": "node -v && node lib/server.js"
   },
   "author": "David Nunez <arizonatribe@gmail.com>",
   "dependencies": {

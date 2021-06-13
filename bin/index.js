@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable global-require */
 const fs = require("fs")
 const path = require("path")
 const { spawnSync } = require("child_process")
@@ -12,7 +13,6 @@ const logger = require("../lib/consoleLogger")
  */
 function scaffoldProject() {
   const args = process.argv.slice(2)
-  const cwd = process.cwd()
 
   try {
     if (!args.length) {
@@ -24,9 +24,10 @@ function scaffoldProject() {
       throw new Error(`Project folder already exists: '${projectFolderName}'`)
     }
 
-    const folderParts = path.resolve(projectFolderName).replace(cwd, "").split(path.sep).filter(Boolean)
+    const projectDir = path.resolve(projectFolderName)
+    const folderParts = [...projectDir.split(path.sep).filter(Boolean), "lib"]
 
-    let currentDir = cwd
+    let currentDir = "/"
     folderParts.forEach(folder => {
       if (!fs.existsSync(path.resolve(currentDir, folder))) {
         fs.mkdirSync(path.resolve(currentDir, folder))
@@ -38,7 +39,7 @@ function scaffoldProject() {
 
     let currentTemplateDir = templateDir
     fs.readdirSync(templateDir).forEach(fileOrFolder => {
-      if (fs.statSync(fileOrFolder).isDirectory()) {
+      if (fs.statSync(path.resolve(currentTemplateDir, fileOrFolder)).isDirectory()) {
         currentTemplateDir = path.resolve(currentTemplateDir, fileOrFolder)
         fs.mkdirSync(path.resolve(currentDir, currentTemplateDir))
       } else {
@@ -53,15 +54,22 @@ function scaffoldProject() {
       license: _l,
       bin: _b,
       ...pkgJson
-    /* eslint-disable-next-line global-require */
     } = require("../package.json")
-    pkgJson.name = projectFolderName
-    pkgJson.private = true
-    pkgJson.description = "TODO"
+    const eslintConfig = fs.readFileSync(path.resolve(__dirname, "..", ".eslintrc"))
 
-    fs.writeFileSync(path.resolve(currentDir, "package.json"), JSON.stringify(pkgJson, null, 2))
+    fs.writeFileSync(
+      path.resolve(projectDir, "package.json"),
+      JSON.stringify({
+        ...pkgJson,
+        name: projectFolderName.split(path.sep).filter(Boolean).reverse()[0],
+        private: true,
+        version: "0.0.1",
+        description: "TODO"
+      }, null, 2)
+    )
+    fs.writeFileSync(path.resolve(projectDir, ".eslintrc"), eslintConfig)
 
-    const { status } = spawnSync("npm", ["install"], { cwd: currentDir, stdio: "inherit" })
+    const { status } = spawnSync("npm", ["install"], { cwd: projectDir, stdio: "inherit" })
 
     if (status) {
       throw new Error("Scaffolding failed‼️")
